@@ -1,15 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Register, RegisterDocument } from './models/register.model';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class UserService {
-  private prisma = new PrismaClient();
+  constructor(
+    @InjectModel(Register.name) private registerModel: Model<RegisterDocument>,
+  ) {}
 
-  async getUsers() {
-    return this.prisma.user.findMany();
+  async register(registerDto: RegisterDto): Promise<Register> {
+    const createdUser = await this.registerModel.create(registerDto);
+    return createdUser.toObject();
   }
-
-  getHello(): string {
-    return 'Hello World!';
+  async getAll(): Promise<Register[]> {
+    return this.registerModel.find();
   }
 }

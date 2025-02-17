@@ -1,0 +1,57 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql" // or "mysql", "sqlite", etc.
+    url      = env("DATABASE_URL_SCHOOL") // Use an environment variable for the connection string
+}
+
+model School {
+    id          String       @id @default(uuid())
+    name        String
+    email       String       @unique
+    departments Department[]
+    teachers    Teacher[]
+}
+
+model Department {
+    id       String    @id @default(uuid())
+    name     String
+    schoolId String
+    school   School    @relation(fields: [schoolId], references: [id])
+    classes  Class[]
+    Teacher  Teacher[]
+}
+
+model Class {
+    id           String     @id @default(uuid())
+    name         String
+    departmentId String
+    department   Department @relation(fields: [departmentId], references: [id])
+    students     Student[]
+    Subject      Subject[]
+}
+
+model Teacher {
+    id           String     @id @default(uuid())
+    name         String
+    schoolId     String
+    departmentId String
+    school       School     @relation(fields: [schoolId], references: [id])
+    department   Department @relation(fields: [departmentId], references: [id])
+}
+
+model Student {
+    id      String @id @default(uuid())
+    name    String
+    classId String
+    class   Class  @relation(fields: [classId], references: [id])
+}
+
+model Subject {
+    id      String @id @default(uuid())
+    name    String
+    classId String
+    class   Class  @relation(fields: [classId], references: [id])
+}
